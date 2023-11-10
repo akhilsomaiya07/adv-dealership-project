@@ -8,10 +8,12 @@ public class UserInterface {
     private Dealership dealership;
     Scanner input = new Scanner(System.in);
 
+//__________________________
+
 
     public UserInterface() {
     }
-
+    //__________________________
     public Dealership getDealership() {
         return dealership;
     }
@@ -20,14 +22,19 @@ public class UserInterface {
         this.dealership = dealership;
     }
 
+//__________________________
 
     private void init(){
         DealershipFileManager dealershipFileManager = new DealershipFileManager();
-        dealership = dealershipFileManager.loadDealership();
+        dealership = dealershipFileManager.getDealership();
     }
     private void updateDealership(){
         DealershipFileManager dealershipFileManager = new DealershipFileManager();
         dealershipFileManager.saveDealership(dealership);
+    }
+    private void updateContract(Contract contract){
+        ContractFileManager contractFileManager = new ContractFileManager();
+        contractFileManager.saveContract(contract);
     }
 
 
@@ -59,7 +66,7 @@ public class UserInterface {
             }
         }
 
-        displayHelper(dealership.getVehiclesByPrice(min, max));
+        displayHelper(dealership.getVehicleByPrice(min, max));
     }
 
     public void processGetByMakeModelRequest(){
@@ -67,7 +74,7 @@ public class UserInterface {
         String make = input.next();
         System.out.println("enter model:\uD83D\uDC49\uD83C\uDFFD");
         String model = input.next();
-        displayHelper(dealership.getVehiclesByMakeModel(make, model));
+        displayHelper(dealership.getVehicleByMakeModel(make, model));
 
     }
 
@@ -93,7 +100,7 @@ public class UserInterface {
                 System.out.println("Invalid input. Please enter valid numbers.");
             }
         }
-        displayHelper(dealership.getVehiclesByYear(min, max));
+        displayHelper(dealership.getVehicleByYear(min, max));
 
     }
 
@@ -101,7 +108,7 @@ public class UserInterface {
         System.out.println("enter color:\uD83D\uDC49\uD83C\uDFFD");
         String color = input.next();
         System.out.println(color);
-        displayHelper(dealership.getVehiclesByColor(color));
+        displayHelper(dealership.getVehicleByColor(color));
     }
 
     public void processGetByMileageRequest(){
@@ -126,17 +133,17 @@ public class UserInterface {
                 System.out.println("Invalid input. Please enter valid numbers.");
             }
         }
-        displayHelper(dealership.getVehiclesByMileage(min, max));
+        displayHelper(dealership.getVehicleByMileage(min, max));
     }
 
     public void processGetByVehicleTypeRequest(){
         System.out.println("enter vehicle type:\uD83D\uDC49\uD83C\uDFFD");
         String type = input.next();
-        displayHelper(dealership.getVehiclesByType(type));
+        displayHelper(dealership.getVehicleByType(type));
     }
 
     public void processGetAllVehicleRequest(){
-        displayHelper(dealership.getAllVehicles());
+        displayHelper(dealership.getAllVehicle());
     }
 
     public void processAddVehicleRequest(){
@@ -159,7 +166,7 @@ public class UserInterface {
         while (year == -1) {
             System.out.print("Enter year: \uD83D\uDC49\uD83C\uDFFD");
             try {
-                year = Integer.parseInt(input.next());
+                year = Integer.parseInt(input.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input for year. Please enter a valid integer(s) ONLY.");
             }
@@ -167,7 +174,7 @@ public class UserInterface {
 
         while (make == null) {
             System.out.print("Enter make:\uD83D\uDC49\uD83C\uDFFD ");
-            make = input.next();
+            make = input.nextLine();
             if (make.contains("|")) {
                 System.out.println("Make cannot contain a pipe character (|)");
                 make = null;
@@ -176,7 +183,7 @@ public class UserInterface {
 
         while (model == null) {
             System.out.print("Enter model: \uD83D\uDC49\uD83C\uDFFD");
-            model = input.next();
+            model = input.nextLine();
             if (model.contains("|")) {
                 System.out.println("Model cannot contain a pipe character (|)");
                 model = null;
@@ -185,7 +192,7 @@ public class UserInterface {
 
         while (vehicleType == null) {
             System.out.print("Enter vehicle type:\uD83D\uDC49\uD83C\uDFFD ");
-            vehicleType = input.next();
+            vehicleType = input.nextLine();
             if (vehicleType.contains("|")) {
                 System.out.println("Vehicle type cannot contain a pipe character (|)");
                 vehicleType = null;
@@ -194,7 +201,7 @@ public class UserInterface {
 
         while (color == null) {
             System.out.print("Enter color:\uD83D\uDC49\uD83C\uDFFD ");
-            color = input.next();
+            color = input.nextLine();
             if (color.contains("|")) {
                 System.out.println("Color cannot contain a pipe character (|)");
                 color = null;
@@ -204,7 +211,7 @@ public class UserInterface {
         while (odometer == -1) {
             System.out.print("Enter odometer:\uD83D\uDC49\uD83C\uDFFD ");
             try {
-                odometer = Integer.parseInt(input.next());
+                odometer = Integer.parseInt(input.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input for odometer. Please enter a valid integer(s) ONLY.");
             }
@@ -213,7 +220,7 @@ public class UserInterface {
         while (price == -1.0) {
             System.out.print("Enter price:\uD83D\uDC49\uD83C\uDFFD ");
             try {
-                price = Double.parseDouble(input.next());
+                price = Double.parseDouble(input.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input for price. Please enter a valid number ONLY");
             }
@@ -229,18 +236,88 @@ public class UserInterface {
         System.out.println("enter the vin of the vehicle you want to remove:\uD83D\uDC49\uD83C\uDFFD ");
         int vin = Integer.parseInt(input.next());
         int counter = 0;
-        for (Vehicle x: dealership.getAllVehicles()){
+        List<Vehicle> allVehicle = new ArrayList<>(dealership.getAllVehicle());
+        for (Vehicle x: allVehicle){
             if (x.getVin()==vin){
-                dealership.removeVehicle(x);
-                System.out.println("vehicle is removed " + x);
-                counter++;
+                try{
+                    dealership.removeVehicle(x);
+                    System.out.println("vehicle is removed " + x);
+                    updateDealership();
+                    counter++;
+                }catch (Exception e){
+                    System.out.println(e);
+                }
+
             }
         }
         if (counter==0) {
             System.out.println("VIN not found! NO vehicle removed!");
-        }else{
-            updateDealership();
         }
+
+    }
+
+    public void processBuyOrLeaseRequest(){
+        System.out.println("Awesome! you like to BUY or LEASE a Vehicle!");
+
+
+        try{
+            System.out.println("Enter B to see buy options, OR L to see Lease options!:");
+            String BorL = input.nextLine();
+            while (!BorL.equalsIgnoreCase("B")||!BorL.equalsIgnoreCase("l")) {
+                if (BorL.equalsIgnoreCase("b")) {
+                    processGetAllVehicleRequest();
+                    System.out.println("Enter the date of the contract:");
+                    String date = input.nextLine();
+                    System.out.println("Enter your name:");
+                    String name = input.nextLine();
+                    System.out.println("Enter your email address:");
+                    String address = input.nextLine();
+                    System.out.println("Would you like to Finance the vehicle? Enter 'Y' for yes OR 'N' for NO:");
+                    boolean finance = input.nextLine().equalsIgnoreCase("Y");
+                    System.out.println("Enter the vin of the vehicle you want to buy:");
+                    int vin = Integer.parseInt(input.nextLine());
+                    Vehicle vehicle = null;
+                    for (Vehicle x : dealership.getAllVehicle()) {
+                        if (x.getVin() == vin) {
+                            vehicle = x;
+                        }
+                    }
+                    dealership.removeVehicle(vehicle);
+                    SalesContract salesContract = new SalesContract(date, name, address, vehicle, finance);
+                    updateContract(salesContract);
+                    updateDealership();
+                    System.out.println("Congratulations!! you have successfully bought this Vehicle:" + vehicle);
+                    break;
+                } else if (BorL.equalsIgnoreCase("l")) {
+                    processGetAllVehicleRequest();
+                    System.out.println("Enter the date of the contract:");
+                    String date = input.nextLine();
+                    System.out.println("Enter your name:");
+                    String name = input.nextLine();
+                    System.out.println("Enter your email address:");
+                    String address = input.nextLine();
+                    System.out.println("Enter the vin of the vehicle you want to buy:");
+                    int vin = Integer.parseInt(input.next());
+                    Vehicle vehicle = null;
+                    for (Vehicle x : dealership.getAllVehicle()) {
+                        if (x.getVin() == vin) {
+                            vehicle = x;
+
+                        }
+                    }
+                    dealership.removeVehicle(vehicle);
+                    LeaseContract salesContract = new LeaseContract(date, name, address, vehicle);
+                    updateContract(salesContract);
+                    updateDealership();
+                    System.out.println("Congratulations!! you have successfully Leased this Vehicle:" + vehicle);
+                    break;
+                }
+            }
+        }catch (Exception e){
+            System.out.println("INVALID!! please enter 'B' to see buying options OR 'L' to see lease options");
+            System.out.println(e);
+        }
+
 
     }
 
@@ -258,11 +335,13 @@ public class UserInterface {
             System.out.println("7) List all vehicles");
             System.out.println("8) Add a vehicle");
             System.out.println("9) Remove a vehicle");
+            System.out.println("10) Buy or Lease a vehicle");
             System.out.println("99) Quit");
 
 
             System.out.print("Your Selection \uD83D\uDC49\uD83C\uDFFD");
-            String input = scanner.next().trim();
+            String input = scanner.nextLine().trim();
+
 
             switch (input) {
                 case "1":
@@ -292,14 +371,18 @@ public class UserInterface {
                 case "9":
                     processRemoveVehicleRequest();
                     break;
+                case "10":
+                    processBuyOrLeaseRequest();
+                    break;
 
                 case "99":
-
                     running=false;
                     break;
             }
         }
     }
+
+
     private void displayHelper(List<Vehicle> listToBeDisplayed){
         for (Vehicle vehicle: listToBeDisplayed){
             System.out.println(vehicle);
