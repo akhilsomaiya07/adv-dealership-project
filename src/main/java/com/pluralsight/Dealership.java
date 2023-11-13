@@ -8,14 +8,12 @@ public class Dealership {
     private String address;
     private String phone;
     private ArrayList<Vehicle> inventory;
-    //__________________________________________
     public Dealership(String name, String address, String phone) {
         this.inventory = new ArrayList<Vehicle>();
         this.name = name;
         this.address = address;
         this.phone = phone;
     }
-//__________________________________________
 
     public String getName() {
         return name;

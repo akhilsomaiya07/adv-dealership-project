@@ -8,7 +8,6 @@ public class UserInterface {
     private Dealership dealership;
     Scanner input = new Scanner(System.in);
 
-//__________________________
 
 
     public UserInterface() {
@@ -22,7 +21,6 @@ public class UserInterface {
         this.dealership = dealership;
     }
 
-//__________________________
 
     private void init(){
         DealershipFileManager dealershipFileManager = new DealershipFileManager();
