@@ -1,78 +1,90 @@
 package com.pluralsight;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 
 public class ContractFileManager {
 
-    public void saveContract(Contract contract){
 
-        String contractType = contract instanceof SalesContract ? "Sale" : "Lease";
-        String date = contract.getDate();
-        String customerName = contract.getCustomerName();
-        String customerEmail = contract.getCustomerEmail();
-        Vehicle vehicleSold = contract.getVehicleSold();
-        int vin = vehicleSold.getVin();
-        int year = vehicleSold.getYear();
-        String make = vehicleSold.getMake();
-        String model = vehicleSold.getModel();
-        String vehicleType = vehicleSold.getVehicleType();
-        String color = vehicleSold.getColor();
-        int odometer = vehicleSold.getOdometer();
-        double price = vehicleSold.getPrice();
-        double monthlyPayment = contract.getMonthlyPayment();
-        double totalCost = 0;
-        double salesTaxAmount = 0;
-        double recordingFee = 0;
-        double processingFee = 0;
-        boolean finance = false;
-        double expectedEndingValue = 0;
-        double leaseFee = 0;
+    public ArrayList<Contract> loadContract() {
+        ArrayList<Contract> contractList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader("Contracts.csv"))) {
 
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] tokens = line.split("\\|");
+                if (tokens[0].equalsIgnoreCase("Sales")) {
+                    String date = tokens[1];
+                    String customerName = tokens[2];
+                    String customerEmail = tokens[3];
+                    int vin = Integer.parseInt(tokens[4]);
+                    int year = Integer.parseInt(tokens[5]);
+                    String make = tokens[6];
+                    String model = tokens[7];
+                    String vehicleType = tokens[8];
+                    String color = tokens[9];
+                    int odometer = Integer.parseInt(tokens[10]);
+                    double price = Double.parseDouble(tokens[11]);
+                    double salesTaxAmount = Double.parseDouble(tokens[12]);
+                    double recordingFee = Double.parseDouble(tokens[13]);
+                    double processingFee = Double.parseDouble(tokens[14]);
+                    double totalCost = Double.parseDouble(tokens[15]);
+                    boolean finance = Boolean.parseBoolean(tokens[16]);
+                    double monthlyPayment = Double.parseDouble(tokens[17]);
 
-        if (contractType.equalsIgnoreCase("Sale")){
-            SalesContract salesCon = (SalesContract) contract;
-            salesTaxAmount =  salesCon.getSalesTaxAmount();
-            recordingFee = salesCon.getRecordingFee();
-            processingFee = salesCon.getProcessingFee();
-            finance = salesCon.isFinance();
-            totalCost = salesCon.getTotalPrice();
+                    Vehicle vehicle = new Vehicle(vin, year, make, model, vehicleType, color, odometer, price);
+                    SalesContract salesContract = new SalesContract(date, customerName, customerEmail, vehicle, finance);
+                    contractList.add(salesContract);
+                } else if (tokens[0].equalsIgnoreCase("Lease")) {
+                    String date = tokens[1];
+                    String customerName = tokens[2];
+                    String customerEmail = tokens[3];
+                    int vin = Integer.parseInt(tokens[4]);
+                    int year = Integer.parseInt(tokens[5]);
+                    String make = tokens[6];
+                    String model = tokens[7];
+                    String vehicleType = tokens[8];
+                    String color = tokens[9];
+                    int odometer = Integer.parseInt(tokens[10]);
+                    double price = Double.parseDouble(tokens[11]);
+                    double expectedEndingValue = Double.parseDouble(tokens[12]);
+                    double leaseFee = Double.parseDouble(tokens[13]);
+                    double totalCost = Double.parseDouble(tokens[14]);
+                    double monthlyPayment = Double.parseDouble(tokens[15]);
+
+                    Vehicle vehicle = new Vehicle(vin, year, make, model, vehicleType, color, odometer, price);
+                    LeaseContract leaseContract = new LeaseContract(date, customerName, customerEmail, vehicle);
+                    contractList.add(leaseContract);
+                } else {
+                    System.out.println("Invalid Contract Type");
+                }
+
+            }
+
+        } catch (IOException e) {
+            System.err.print(e);
         }
-        if(contractType.equalsIgnoreCase("Lease")){
-            LeaseContract leaseCon= (LeaseContract) contract;
-            expectedEndingValue = leaseCon.getExpectedEndingValue();
-            leaseFee = leaseCon.getLeaseFee();
-            totalCost = leaseCon.getTotalPrice();
-        }
+        return contractList;
+    }
 
-
-
-        try( BufferedWriter bw = new BufferedWriter(new FileWriter("Contracts.csv",true))){
-            if(contract instanceof SalesContract)
-
-            {
-                try{
-                    bw.write(contractType.toUpperCase() + "|" + date + "|" + customerName + "|" + customerEmail + "|" + vin + "|" + year + "|" + make + "|" + model + "|" + vehicleType + "|" + color + "|" + odometer + "|" + price + "|" + salesTaxAmount + "|" + recordingFee + "|" + processingFee + "|" + totalCost + "|" + finance + "".toUpperCase() + "|" + monthlyPayment + "\n");
-
+    public void saveContract(Contract contract) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("Contracts.csv", true))) {
+            if (contract instanceof SalesContract) {
+                try {
+                    bw.write(contract.toString());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (contract instanceof LeaseContract) {
+                try {
+                    bw.write(contract.toString());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
             }
-
-            if(contract instanceof LeaseContract)
-
-            {
-                try{
-                    bw.write(contractType.toUpperCase() + "|" + date + "|" + customerName + "|" + customerEmail + "|" + vin + "|" + year + "|" + make + "|" + model + "|" + vehicleType + "|" + color + "|" + odometer + "|" + price + "|" + expectedEndingValue + "|" + leaseFee + "|" + totalCost + "|" + monthlyPayment+ "\n");
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Provide a valid contract, ONLY LEASE OR SALES CONTRACT ARE SUPPORTED");
         }
     }
