@@ -12,7 +12,6 @@ public class UserInterface {
 
     public UserInterface() {
     }
-    //__________________________
     public Dealership getDealership() {
         return dealership;
     }
